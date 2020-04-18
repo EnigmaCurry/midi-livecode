@@ -1,0 +1,6 @@
+[submodule "isobar"]
+	path = isobar
+	url = ./isobar/
+[submodule "watchgod"]
+	path = watchgod
+	url = https://github.com/samuelcolvin/watchgod.git
