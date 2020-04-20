@@ -50,7 +50,7 @@ class Timeline(object):
             # Create internal clock for native timekeeping.
             #------------------------------------------------------------------------
             self.clock = Clock(60.0 / (clock * TICKS_PER_BEAT))
-    
+
     @property
     def bpm(self):
         """ Returns the tempo of this timeline's clock, or None if an external
@@ -167,7 +167,7 @@ class Timeline(object):
         By default, attempts to run as a high-priority thread for more
         accurate timing (though requires being run as root to re-nice the
         process.)
-        
+
         If stop_when_done is set, returns when no channels are currently
         scheduled; otherwise, keeps running indefinitely. """
         log.info("Timeline: Running")
@@ -201,6 +201,10 @@ class Timeline(object):
         except Exception as e:
             print((" *** Exception in background Timeline thread: %s" % e))
             traceback.print_exc(file = sys.stdout)
+
+    def all_notes_off(self):
+        for d in self.devices:
+            d.all_notes_off()
 
     def warp(self, warper):
         """ Apply a PWarp object to warp our clock's timing. """
@@ -342,6 +346,7 @@ class Channel:
                 if self.count_max and self.count_now >= self.count_max:
                     raise StopIteration
         except StopIteration:
+            self.device.all_notes_off()
             self.finished = True
 
         self.pos += time
@@ -531,11 +536,13 @@ class Channel:
 #----------------------------------------------------------------------
 
 class Clock:
-    def __init__(self, tick_size=(1.0 / TICKS_PER_BEAT)):
+    def __init__(self, tick_size=(1.0 / TICKS_PER_BEAT), max_beats=None):
         self.tick_size_orig = tick_size
         self.tick_size = tick_size
         self.warpers = []
         self.accelerate = 1.0
+        self.max_beats = max_beats
+        self.beats = 0
 
     @property
     def bpm(self):
@@ -546,7 +553,7 @@ class Clock:
         try:
             #------------------------------------------------------------------------
             # allow a tick to elapse before we call tick() for the first time
-            # to keep Warp patterns in sync  
+            # to keep Warp patterns in sync
             #------------------------------------------------------------------------
             while True:
                 if clock1 - clock0 >= self.tick_size:
@@ -554,6 +561,11 @@ class Clock:
                     timeline.tick()
                     clock0 += self.tick_size
                     self.tick_size = self.tick_size_orig
+
+                    self.beats += self.tick_size * 2 ## why multiply by 2??
+                    if self.max_beats and self.beats > self.max_beats :
+                        raise StopIteration
+
                     for warper in self.warpers:
                         warp = next(warper)
                         #------------------------------------------------------------------------

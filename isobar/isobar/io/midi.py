@@ -108,7 +108,7 @@ class MidiOut:
         self.midi.send_message([ 0x80 + channel, int(note), 0 ])
 
     def all_notes_off(self, channel = 0):
-        log.debug("[midi] All notes off (channel = %d)" % (channel))
+        log.info("[midi] All notes off (channel = %d)" % (channel))
         for n in range(128):
             self.note_off(n, channel)
 

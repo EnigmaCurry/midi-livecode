@@ -1,9 +1,10 @@
-import os
+import os, sys
 import logging
 log = logging.getLogger(os.path.basename(__file__))
 
 import isobar as ib
-from livecode import create_timeline
+from isobar.io.midifile import MidiFileOut
+from livecode import create_timeline, midi_reset
 import sequences
 
 def main():
@@ -12,8 +13,12 @@ def main():
     #euclidean()
     #rhythm_phase()
 
-    # custom rule for molecular music box::
-    def scale_rule(scale_index, mod_time, times, swapped):
+    # Create timeline that outputs to a midi file
+    #midi_file = MidiFileOut("output.mid")
+    #timeline_file = ib.Timeline(250, midi_file)
+
+    # custom rules for molecular music box::
+    def scale_rule1(scale_index, mod_time, times, swapped):
         if swapped:
             if times.get(mod_time, 0) % 2 == 0:
                 return scale_index + 2
@@ -21,7 +26,16 @@ def main():
                 return scale_index - 1
         else:
             return scale_index + 1
-    molecular_music_box("9A#5", loops=8, bars=4, octave=3, scale=ib.Scale.dorian, bpm=250, delay=True, scale_rule=scale_rule)
+
+    timeline = create_timeline(120)
+    molecular_music_box("4F5", loops=12, bars=4, octave=3, channels=4,
+                        scale=ib.Scale.phrygian, delay=True, gate=0.9,
+                        scale_rule=scale_rule1, forever=True, timeline=timeline)
+
+def permute():
+    timeline = create_timeline(120)
+    timeline.sched({'note': ib.PSeq([0]) + 60, 'dur': 10, 'gate': 0.99})
+    timeline.run()
 
 def euclidean():
     timeline = create_timeline(120)
@@ -47,12 +61,19 @@ def rhythm_phase():
     timeline.sched({ 'note': melody + 84, 'dur': rhythm * 0.25 })
     timeline.run()
 
-def molecular_music_box(seed="4E3", loops=4, bars=4, scale=ib.Scale.major, octave=3, bpm=120, delay=True, scale_rule=None):
-    timeline = create_timeline(bpm)
-    loop_notes, loop_durations = sequences.molecular_music_box(seed, loops=loops, scale=scale, scale_rule=scale_rule)
-    d = 0
+def molecular_music_box(seed="4E3", loops=4, bars=4, forever=False, scale=ib.Scale.major,
+                        octave=3, delay=True, scale_rule=None,
+                        gate=0.99, channels=1, timeline=None):
+    if timeline is None:
+        timeline = create_timeline(120)
+    loop_notes, loop_durations = sequences.molecular_music_box(
+        seed, loops=loops, scale=scale, scale_rule=scale_rule)
+    kwargs = {'delay': 0}
+
     for i in range(len(loop_notes)):
-        timeline.sched({ 'note': loop_notes[i] + octave*12, 'dur': loop_durations[i]}, delay=d)
+        timeline.sched({ 'note': ib.PLoop(loop_notes[i] + octave*12, ), 'dur':
+                         loop_durations[i], 'gate': gate, 'channel': i %
+                         channels}, **kwargs)
         if delay:
-            d += (4 * bars)
-    timeline.run()
+            kwargs['delay'] += (4 * bars)
+    timeline.run(stop_when_done=False)
