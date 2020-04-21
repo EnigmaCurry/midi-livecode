@@ -5,7 +5,7 @@ import logging
 
 log = logging.getLogger(os.path.basename(__file__))
 
-def molecular_music_box(seed, scale=ib.Scale.major, loops=4, bars=4, beats_per_bar = 4, scale_rule=None):
+def molecular_music_box(seed, scale=ib.Scale.major, loops=4, bars=4, beats_per_bar = 4, scale_rule=None, duration_rule=None):
     "The Molecular Music Box - https://youtu.be/3Z8CuAC_-bg"
 
     ## The Molecular Formula:
@@ -27,8 +27,6 @@ def molecular_music_box(seed, scale=ib.Scale.major, loops=4, bars=4, beats_per_b
     dur1 = float(dur1) if float(dur1) - int(float(dur1)) > 0 else int(dur1)
     dur2 = float(dur2) if float(dur2) - int(float(dur2)) > 0 else int(dur2)
 
-    loop_notes = []
-    loop_durations = []
     times = {}
     beats = 0
 
@@ -40,52 +38,36 @@ def molecular_music_box(seed, scale=ib.Scale.major, loops=4, bars=4, beats_per_b
         def scale_rule(scale_index, mod_time, times, swapped):
             return scale_index + 1
 
-    for loop in range(loops):
-        log.info("loop: {}".format(loop))
-        if loop == 0:
-            loop_notes.append([scale.get(scale_index) + transpose])
-            notes = loop_notes[0]
-            last_note = notes[0]
-            loop_durations.append([dur1])
-            durations = loop_durations[0]
-            log.info("beats:{beats} note:{note} name:{name} dur:{dur}".format(
-                beats=beats, note=last_note, name=ib.Note.names[last_note % 12], dur=dur1))
-            last_duration = dur1
-            swap_duration = dur2
-            beats += dur1
-            times[0] = 1
-        else:
-            notes = []
-            loop_notes.append(notes)
-            durations = []
-            loop_durations.append(durations)
-        beats_per_loop = beats_per_bar * bars
-        while beats < beats_per_loop * (loop+1):
-            mod_time = beats % (bars * beats_per_bar)
+    if duration_rule is None:
+        def duration_rule(mod_time, times, last_duration, swap_duration):
             if mod_time in times:
-                dur = swap_duration
-                swapped = True
-                last_duration, swap_duration = swap_duration, last_duration
+                return (swap_duration, last_duration, True)
             else:
-                swapped = False
-                dur = last_duration
-            if not len(notes) and beats % beats_per_loop != 0:
-                # insert rest
-                notes.append(None)
-                durations.append(beats % beats_per_loop)
-            scale_index = scale_rule(scale_index, mod_time, times, swapped)
-            log.info(scale_index)
-            last_note = scale.get(scale_index) + transpose
-            notes.append(last_note)
-            log.info("beats:{beats} note:{note} name:{name} dur:{dur} mod_time:{mod_time} swapped:{swapped}".format(
-                beats=beats, note=last_note, name=ib.Note.names[last_note % 12], dur=dur, mod_time=mod_time, swapped=swapped))
-            durations.append(dur)
-            beats += dur
-            times[mod_time] = times.get(mod_time, 0) + 1
-    log.info(loop_notes)
-    log.info(loop_durations)
+                return (last_duration, swap_duration, False)
 
-    for i in range(len(loop_notes)):
-        loop_notes[i] = ib.PSeq(loop_notes[i])
-        loop_durations[i] = ib.PSeq(loop_durations[i])
-    return (loop_notes, loop_durations)
+    note_loops = []
+
+    duration = dur1
+    swap_duration = dur2
+    last_note = None
+    loop_beats = bars * beats_per_bar
+    for loop in range(loops):
+        note_loop = []
+        while beats < loop_beats*(loop+1):
+            mod_time = beats % loop_beats
+            duration, swap_duration, swapped = duration_rule(mod_time=mod_time,
+                                                              times=times, last_duration=duration, swap_duration=swap_duration)
+            log.info("duration:{} swapped:{}".format(duration, swapped))
+            if last_note is None:
+                note = last_note = 0
+            else:
+                scale_index = scale_rule(scale_index=scale.indexOf(last_note),
+                                                     mod_time=mod_time, times=times, swapped=swapped)
+                note = last_note = scale.get(scale_index)
+            # Create one-note loop with rest:
+            time_left = loop_beats - duration
+            note_loop.append({'note':(note, None), 'dur':(duration, time_left), 'delay': beats})
+            beats += duration
+            times[mod_time] = times.get(mod_time, 0) + 1
+        note_loops.append(note_loop)
+    return note_loops

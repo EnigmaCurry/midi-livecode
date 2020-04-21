@@ -202,10 +202,6 @@ class Timeline(object):
             print((" *** Exception in background Timeline thread: %s" % e))
             traceback.print_exc(file = sys.stdout)
 
-    def all_notes_off(self):
-        for d in self.devices:
-            d.all_notes_off()
-
     def warp(self, warper):
         """ Apply a PWarp object to warp our clock's timing. """
         self.clock.warp(warper)
@@ -346,7 +342,6 @@ class Channel:
                 if self.count_max and self.count_now >= self.count_max:
                     raise StopIteration
         except StopIteration:
-            self.device.all_notes_off()
             self.finished = True
 
         self.pos += time
