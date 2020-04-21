@@ -28,9 +28,16 @@ def main():
             else:
                 return scale_index - 4
 
-    timeline = create_timeline(240)
-    molecular_music_box("4E9", loops=18, bars=4, octave=3, delay=True,
+    def scale_rule2(scale_index, mod_time, times, swapped, n_loop_notes):
+        raise NotImplementedError("make me")
+
+
+    timeline = create_timeline(120)
+    molecular_music_box("4E9", background=True, loops=18, bars=4, octave=3, delay=True,
                         channels=4, scale=ib.Scale.dorian, timeline=timeline, scale_rule=scale_rule1)
+
+    molecular_music_box("3E19", loops=18, bars=4, octave=2, delay=True,
+                        channels=4, channel_offset=2, scale=ib.Scale.dorian, timeline=timeline, scale_rule=scale_rule1)
 
 def rhythm_phase():
     timeline = create_timeline(100)
@@ -41,8 +48,8 @@ def rhythm_phase():
 
 def molecular_music_box(seed="4E3", loops=4, bars=4, scale=ib.Scale.major,
                         octave=3, delay=True, scale_rule=None,
-                        duration_rule=None, gate=0.99, channels=1,
-                        timeline=None, beats_per_bar=4):
+                        duration_rule=None, gate=0.99, channels=1, channel_offset=0,
+                        timeline=None, beats_per_bar=4, background=False):
     if timeline is None:
         timeline = create_timeline(120)
     note_loops = sequences.molecular_music_box( seed, loops=loops, scale=scale,
@@ -58,9 +65,12 @@ def molecular_music_box(seed="4E3", loops=4, bars=4, scale=ib.Scale.major,
                 d = loop['delay'] - (bars * beats_per_bar * l)
             seq = ib.PSeq(loop['note'])  + octave*12
             if seq.nextn(1)[0] < 128: # protect against too high midi notes
-                timeline.sched({'note': seq, 'dur':
-                                ib.PSeq(loop['dur']), 'gate': gate, 'channel': l %
-                                channels}, delay=d)
+                timeline.sched({'note': seq, 'dur': ib.PSeq(loop['dur']),
+                                'gate': gate, 'channel': (l % channels) +
+                                channel_offset}, delay=d)
 
-    timeline.run()
+    if background:
+        timeline.background()
+    else:
+        timeline.run()
 
