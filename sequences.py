@@ -59,11 +59,11 @@ def molecular_music_box(seed, scale=ib.Scale.major, loops=4, bars=4, beats_per_b
                                                               times=times, last_duration=duration, swap_duration=swap_duration)
             log.info("duration:{} swapped:{}".format(duration, swapped))
             if last_note is None:
-                note = last_note = 0
+                note = last_note = 0 + transpose
             else:
                 scale_index = scale_rule(scale_index=scale.indexOf(last_note),
                                                      mod_time=mod_time, times=times, swapped=swapped)
-                note = last_note = scale.get(scale_index)
+                note = last_note = scale.get(scale_index) + transpose
             # Create one-note loop with rest:
             time_left = loop_beats - duration
             note_loop.append({'note':(note, None), 'dur':(duration, time_left), 'delay': beats})
