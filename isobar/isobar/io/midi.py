@@ -60,8 +60,14 @@ class MidiIn:
         message = self.midi.get_message()
         if not message:
             return
-
         try:
+            # Get clock
+            if message[0][0] == 0xF8:
+                return "clock"
+        except:
+            pass
+        try:
+            # Get notes
             data_type, data_note, data_vel = message[0]
 
             if (data_type & 0x90) > 0 and data_vel > 0:

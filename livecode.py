@@ -8,13 +8,23 @@ logging.basicConfig(level=logging.INFO)
 import isobar as ib
 import rtmidi
 import mido
-import timelines
 import watchgod
 
 midi_in_port = "01. Internal MIDI"
 midi_out_port = "02. Internal MIDI"
 
 log = logging.getLogger(os.path.basename(__file__))
+
+def get_midi_input():
+    ports = mido.get_input_names()
+    for p in ports:
+        if re.match(midi_in_port, p):
+            port = mido.open_input(p, autoreset=True)
+            port.close()
+            inp = ib.io.midi.MidiIn(target=p)
+            return inp
+    else:
+        raise RuntimeError("Midi in port not found")
 
 def get_midi_output():
     ports = mido.get_output_names()
@@ -40,7 +50,15 @@ def create_timeline(bpm=120, output=None):
 
 if __name__ == "__main__":
     #live coding devloop:
+    import timelines
+    midi_in = get_midi_input()
     try:
+        print("Listening for external clock before start ...")
+        while True:
+            note = midi_in.poll()
+            if note is not None:
+                print("uh")
+                break
         watchgod.run_process(os.curdir, timelines.main, args=())
     finally:
         midi_reset()
