@@ -2,18 +2,23 @@
 
 import os
 import re
+import threading
 import logging
 logging.basicConfig(level=logging.INFO)
 
 import isobar as ib
 import rtmidi
 import mido
+import LinkToPy
 import watchgod
 
 midi_in_port = "01. Internal MIDI"
 midi_out_port = "02. Internal MIDI"
+carabiner_path = "Carabiner.exe"
 
 log = logging.getLogger(os.path.basename(__file__))
+logging.getLogger("edn_format").setLevel(logging.WARN)
+
 
 def get_midi_input():
     ports = mido.get_input_names()
@@ -30,35 +35,25 @@ def get_midi_output():
     ports = mido.get_output_names()
     for p in ports:
         if re.match(midi_out_port, p):
-            port = mido.open_output(p, autoreset=True)
-            port.close()
+            # port = mido.open_output(p, autoreset=True)
+            # port.close()
             out = ib.io.midi.MidiOut(target=p)
             return out
     else:
         raise RuntimeError("Midi out port not found")
 
-def midi_reset(port=None):
-    if port is None:
-        port = get_midi_output()
-    else:
-        port.reset()
-
-def create_timeline(bpm=120, output=None):
-    if output is None:
-        output = get_midi_output()
+def create_timeline(output, bpm=120):
+    for ch in range(16):
+        output.all_notes_off(ch)
     return ib.Timeline(bpm, output)
 
-if __name__ == "__main__":
+
+def main():
     #live coding devloop:
+    # carabiner_thread = threading.Thread(target=lambda : os.system(carabiner_path + " > carabiner.log"))
+    # carabiner_thread.start()
     import timelines
-    midi_in = get_midi_input()
-    try:
-        print("Listening for external clock before start ...")
-        while True:
-            note = midi_in.poll()
-            if note is not None:
-                print("uh")
-                break
-        watchgod.run_process(os.curdir, timelines.main, args=())
-    finally:
-        midi_reset()
+    watchgod.run_process(os.curdir, timelines.main, args=())
+
+if __name__ == "__main__":
+    main()

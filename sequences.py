@@ -62,6 +62,7 @@ def molecular_music_box(seed, scale=ib.Scale.major, loops=4, bars=4, beats_per_b
             if last_note is None:
                 note = last_note = 0 + transpose
             else:
+                last_scale_index = scale_index
                 scale_index = scale_rule(scale_index=scale.indexOf(last_note),
                                          mod_time=mod_time, times=times, swapped=swapped, n_loop_notes=n_loop_notes)
                 note = last_note = scale.get(scale_index) + transpose
