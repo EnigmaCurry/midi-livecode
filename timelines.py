@@ -11,16 +11,16 @@ import LinkToPy
 
 def main(timeline):
     "main timeline goes here"
-    # molecular_music_box( timeline, "4E10", loops=18, bars=4,
-    #                      octave=2, length_multiplier=1, delay=True, channels=1,
-    #                      scale=ib.Scale.major, amp=64)
+    molecular_music_box(timeline, "4E3", loops=18, bars=4, octave=3,
+                        length_multiplier=1, delay=True, channels=1,
+                        scale=ib.Scale.major, amp=32, gate=1)
 
-    rhythm_phase(timeline)
+    #rhythm_phase(timeline)
 
 def rhythm_phase(timeline):
     melody = ib.PSeq([ -7, -5, 0, 2, 3, -5, -7, 2, 0, -5, 3, 2 ])
     rhythm = ib.PSeq([ 2, 2, 4, 1, 1 ])
-    timeline.sched({ 'note': melody + 84, 'dur': rhythm * 0.25 })
+    timeline.sched({ 'note': melody + 84, 'dur': rhythm * 0.25}, delay=0)
 
 def molecular_music_box(timeline, seed="4E3", loops=4, bars=4, scale=ib.Scale.major,
                         octave=3, delay=True, scale_rule=None,
@@ -38,7 +38,6 @@ def molecular_music_box(timeline, seed="4E3", loops=4, bars=4, scale=ib.Scale.ma
             if not delay:
                 d = loop['delay'] - (bars * beats_per_bar * l)
             seq = ib.PSeq(loop['note']) + octave*12
-            if seq.nextn(1)[0] < 128: # protect against too high midi notes
-                timeline.sched({'note': seq, 'dur': ib.PSeq(loop['dur']) * length_multiplier,
-                                'gate': gate, 'channel': (l % channels) +
-                                channel_offset, 'amp': amp}, delay=d)
+            timeline.sched({'note': seq, 'dur': ib.PSeq(loop['dur']) * length_multiplier,
+                            'gate': gate, 'channel': (l % channels) +
+                            channel_offset, 'amp': amp}, delay=d)

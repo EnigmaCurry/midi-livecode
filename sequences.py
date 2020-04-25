@@ -22,7 +22,7 @@ def molecular_music_box(seed, scale=ib.Scale.major, loops=4, bars=4, beats_per_b
     ##    the same time in the loop as any previous note, in which case, change
     ##    the duration of the new note to the other chosen duration.
 
-    m = re.match("([0-9]*[.]?[0-9]+)([A-Ga-g][#]?)([0-9]*[.]?[0-9]+)", seed)
+    m = re.match("([0-9]*[.]?[0-9]+)([A-Ga-g][#b]?)([0-9]*[.]?[0-9]+)", seed)
     dur1, key, dur2 = m.groups()
     dur1 = float(dur1) if float(dur1) - int(float(dur1)) > 0 else int(dur1)
     dur2 = float(dur2) if float(dur2) - int(float(dur2)) > 0 else int(dur2)
@@ -62,15 +62,15 @@ def molecular_music_box(seed, scale=ib.Scale.major, loops=4, bars=4, beats_per_b
             if swapped:
                 swaps += 1
             if last_note is None:
-                note = last_note = 0 + transpose
+                note = last_note = 0
             else:
                 last_scale_index = scale_index
                 scale_index = scale_rule(scale_index=scale.indexOf(last_note),
                                          mod_time=mod_time, times=times, swapped=swapped, n_loop_notes=n_loop_notes)
-                note = last_note = scale.get(scale_index) + transpose
+                note = last_note = scale.get(scale_index)
             # Create one-note loop with rest:
             time_left = loop_beats - duration
-            note_loop.append({'note':(note, None), 'dur':(duration, time_left), 'delay': beats})
+            note_loop.append({'note':(note + transpose, None), 'dur':(duration, time_left), 'delay': beats})
             n_loop_notes += 1
             beats += duration
             times[mod_time] = times.get(mod_time, 0) + 1
