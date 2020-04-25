@@ -88,12 +88,16 @@ def timeline_main():
         timelines.main(timeline)
         timeline.run()
 
+class CodeWatcher(watchgod.DefaultWatcher):
+    def should_watch_file(self, entry):
+        return entry.name.endswith(('.py', '.pyx', '.pyd')) and not entry.name.startswith(".")
+
 def main():
     #live coding devloop:
     carabiner_thread = threading.Thread(target=lambda : os.system(carabiner_path + " > carabiner.log"))
     carabiner_thread.start()
     if live_reload:
-        watchgod.run_process(os.curdir, timeline_main, args=())
+        watchgod.run_process(os.curdir, timeline_main, args=(), watcher_cls=CodeWatcher)
     else:
         timeline_main()
 
