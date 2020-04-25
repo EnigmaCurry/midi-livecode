@@ -10,9 +10,11 @@ import sequences
 import LinkToPy
 
 def main(timeline):
+    "main timeline goes here"
     # molecular_music_box( timeline, "4E10", loops=18, bars=4,
     #                      octave=2, length_multiplier=1, delay=True, channels=1,
     #                      scale=ib.Scale.major, amp=64)
+
     rhythm_phase(timeline)
 
 def rhythm_phase(timeline):

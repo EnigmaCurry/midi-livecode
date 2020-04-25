@@ -20,6 +20,7 @@ live_reload = True
 use_ableton_link = True
 default_bpm = 120 # BPM to use when not using ableton link
 carabiner_path = "Carabiner.exe"
+nudge_time = 0.03
 
 log = logging.getLogger(os.path.basename(__file__))
 logging.getLogger("edn_format").setLevel(logging.WARN)
@@ -69,7 +70,7 @@ def timeline_main():
             playing = msg_data.get("playing", False)
             if playing and not timeline.started:
                 beat_time = (60 / msg_data['bpm'])
-                delay_time = (4*beat_time) - (beat_time * (msg_data['beat'] % 4))
+                delay_time = (4*beat_time) - (beat_time * (msg_data['beat'] % 4)) - nudge_time
                 time.sleep(delay_time)
                 timeline.background()
             elif not playing and timeline.started:

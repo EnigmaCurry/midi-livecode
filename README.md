@@ -1,6 +1,6 @@
 # midi-livecode
 
-This is a live-coding environment for MIDI composition.
+This is a live-coding environment for MIDI composition with support for Ableton Link.
 
  * Install a MIDI loop driver 
    * Windows: https://www.nerds.de/en/loopbe1.html 
@@ -27,6 +27,8 @@ This is a live-coding environment for MIDI composition.
      `Carabiner.exe` in the same directory. Update `carabiner_path` if the name
      or location differs on your system.
    * `default_bpm` - The beats per minute to use if *not* using Ableton Link.
+   * `nudge_time` - Start playback earlier than otherwise, to correct for
+     constant-time delay (seconds).
  * Run `python livecode.py` and it will autoreload on save
 
 ## Isobar
@@ -34,6 +36,14 @@ This is a live-coding environment for MIDI composition.
 Isobar is forked from https://github.com/ideoforms/isobar and several
 modifications are made herein. [Please follow the isobar LICENSE
 terms](isobar/LICENSE.md)
+
+## Live reload
+
+When changes are detected in the source files, the program automatically
+restarts. This may be different than other live-coding environments you may be
+familiar with, that are built to introduce changes to the music without
+restarting. My use-case is for composition, not live concerts, so restarting
+makes sense for me.
 
 ## Ableton Link
 
@@ -49,4 +59,5 @@ When Ableton Link is enabled, the bpm of your timeline is automatically set to
 the one in your connected DAW or other app. **This only works when the timeline
 is stopped.** There is currently no support to change the bpm once playback has
 started. Furthermore, there is no accounting for timing drift (this is not
-expected to happen with a midi loopback.) 
+expected to happen with a midi loopback.) To correct for constant-time delay,
+set `nudge_time`.
