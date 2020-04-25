@@ -1,4 +1,5 @@
 import os, sys
+import time
 import logging
 log = logging.getLogger(os.path.basename(__file__))
 
@@ -8,28 +9,11 @@ from livecode import create_timeline, get_midi_output
 import sequences
 import LinkToPy
 
-def main():
-    output = get_midi_output()
-    ableton_link = LinkToPy.LinkInterface("Carabiner.exe", callbacks={"status":lambda msg_data: print(msg_data)})
-    timeline = create_timeline(output, ableton_link.bpm_)
-    ryan1(timeline)
-
-    def ableton_transport_stop(msg_data):
-        nonlocal timeline
-        print(msg_data)
-        playing = msg_data.get("playing", False)
-        if playing and not timeline.started:
-            timeline.background()
-        elif not playing and timeline.started:
-            timeline.stop()
-            timeline = create_timeline(output, ableton_link.bpm_)
-            ryan1(timeline)
-    ableton_link.status(callback=ableton_transport_stop)
-
-def ryan1(timeline):
-    molecular_music_box( timeline, "4E9", loops=18, bars=4,
-                         octave=2, length_multiplier=1, delay=True, channels=1,
-                         scale=ib.Scale.major, amp=64)
+def main(timeline):
+    # molecular_music_box( timeline, "4E10", loops=18, bars=4,
+    #                      octave=2, length_multiplier=1, delay=True, channels=1,
+    #                      scale=ib.Scale.major, amp=64)
+    rhythm_phase(timeline)
 
 def rhythm_phase(timeline):
     melody = ib.PSeq([ -7, -5, 0, 2, 3, -5, -7, 2, 0, -5, 3, 2 ])

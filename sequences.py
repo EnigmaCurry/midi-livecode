@@ -51,6 +51,7 @@ def molecular_music_box(seed, scale=ib.Scale.major, loops=4, bars=4, beats_per_b
     swap_duration = dur2
     last_note = None
     loop_beats = bars * beats_per_bar
+    swaps = 0
     for loop in range(loops):
         note_loop = []
         n_loop_notes = 0
@@ -58,7 +59,8 @@ def molecular_music_box(seed, scale=ib.Scale.major, loops=4, bars=4, beats_per_b
             mod_time = beats % loop_beats
             duration, swap_duration, swapped = duration_rule(mod_time=mod_time,
                                                               times=times, last_duration=duration, swap_duration=swap_duration)
-            log.info("duration:{} swapped:{}".format(duration, swapped))
+            if swapped:
+                swaps += 1
             if last_note is None:
                 note = last_note = 0 + transpose
             else:
@@ -73,4 +75,5 @@ def molecular_music_box(seed, scale=ib.Scale.major, loops=4, bars=4, beats_per_b
             beats += duration
             times[mod_time] = times.get(mod_time, 0) + 1
         note_loops.append(note_loop)
+    log.info("seed:{seed} swaps:{swaps}".format(seed=seed,swaps=swaps))
     return note_loops

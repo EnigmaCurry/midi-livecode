@@ -34,7 +34,7 @@ class LinkInterface():
     """A simple python client to communicate with carabiner (a Abelton Link connector)
         Carabiner server must be running to use. Requires edn_format [$pip install edn_format]"""
 
-    def __init__(self, path_to_carabiner, tcp_ip='127.0.0.1', tcp_port=17000, buffer_size=1024, callbacks=None, enable_sync=True):
+    def __init__(self, tcp_ip='127.0.0.1', tcp_port=17000, buffer_size=1024, callbacks=None, enable_sync=True):
         self._tcp_ip = tcp_ip
         self._tcp_port = tcp_port
         self._buffer_size = buffer_size
@@ -47,13 +47,13 @@ class LinkInterface():
         else:
             self.callbacks = callbacks
 
-        self.open_carabiner_socket(path_to_carabiner)
+        self.open_carabiner_socket()
         if enable_sync:
             self.s.send(b'enable-start-stop-sync\n')
 
-        thread = threading.Thread(target=self._listener)
-        thread.daemon = True
-        thread.start()
+        self.thread = threading.Thread(target=self._listener)
+        self.thread.daemon = True
+        self.thread.start()
         print('LinkInterface Started')
 
     def decode_edn_msg(self, msg):
@@ -71,47 +71,47 @@ class LinkInterface():
 
     def status(self, callback=None):
         """Wrapper for Status"""
-        self.s.send(b'status')
+        self.s.send(b'status\n')
         if callback is not None:
             self.callbacks['status'] = callback
 
     def set_bpm(self, bpm, callback=None):
         """Wrapper for bpm"""
-        msg = 'bpm ' + str(bpm)
+        msg = 'bpm ' + str(bpm) + "\n"
         self.s.send(msg.encode())
         if callback is not None:
             self.callbacks['bpm'] = callback
 
     def beat_at_time(self, time_in_ms, quantum=8, callback=None):
         """Wrapper for Beat At Time"""
-        msg = 'beat-at-time ' + str(time_in_ms) + ' ' + str(quantum)
+        msg = 'beat-at-time ' + str(time_in_ms) + ' ' + str(quantum) + "\n"
         self.s.send(msg.encode())
         if callback is not None:
             self.callbacks['beat-at-time'] = callback
 
     def time_at_beat(self, beat, quantum=8, callback=None):
         """Wrapper for Time At Beat"""
-        msg = 'time-at-beat ' + str(beat) + ' ' + str(quantum)
+        msg = 'time-at-beat ' + str(beat) + ' ' + str(quantum) + "\n"
         self.s.send(msg.encode())
         if callback is not None:
             self.callbacks['time-at-beat'] = callback
 
     def phase_at_time(self, time_in_ms, quantum=8, callback=None):
         """Wrapper for Phase At Time"""
-        msg = 'phase-at-time ' + str(time_in_ms) + ' ' + str(quantum)
+        msg = 'phase-at-time ' + str(time_in_ms) + ' ' + str(quantum) + "\n"
         self.s.send(msg.encode())
         if callback is not None:
             self.callbacks['phase-at-time'] = callback
 
     def force_beat_at_time(self, beat, time_in_ms, quantum=8, callback=None):
         """Wrapper for Beat At Time"""
-        msg = 'force-beat-at-time ' + str(beat) + ' ' + str(time_in_ms) + ' ' + str(quantum)
+        msg = 'force-beat-at-time ' + str(beat) + ' ' + str(time_in_ms) + ' ' + str(quantum) + "\n"
         self.s.send(msg.encode())
         if callback is not None:
             self.callbacks['force-beat-at-time'] = callback
 
     def request_beat_at_time(self, beat, time_in_ms, quantum=8, callback=None):
-        msg = 'request-beat-at-time ' + str(beat) + ' ' + str(time_in_ms) + ' ' + str(quantum)
+        msg = 'request-beat-at-time ' + str(beat) + ' ' + str(time_in_ms) + ' ' + str(quantum) + "\n"
         self.s.send(msg.encode())
         if callback is not None:
             self.callbacks['request-beat-at-time'] = callback
@@ -151,13 +151,13 @@ class LinkInterface():
         See the Carabiner note on Clocks for more information"""
         return int(time.monotonic() * 1000 * 1000)
 
-    def start_carabiner(self, path_to_car):
-        print(path_to_car)
-        os.system(path_to_car +" >car_logs.log")
+    # def start_carabiner(self, path_to_car):
+    #     print(path_to_car)
+    #     os.system(path_to_car +" >car_logs.log")
 
-    def open_carabiner_socket(self, carabiner_path):
-        thread = threading.Thread(target=self.start_carabiner, args=[carabiner_path])
-        thread.start()
+    def open_carabiner_socket(self):
+        # thread = threading.Thread(target=self.start_carabiner, args=[carabiner_path])
+        # thread.start()
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         not_connected = True
@@ -197,7 +197,7 @@ class LinkInterface():
         self.s.close()
 
 if __name__ == "__main__":
-    link = LinkInterface("/mnt/c/Users/bdyet/GoogleDrive/PersonalProjects/carabiner/build/bin/Carabiner")
+    link = LinkInterface()
 
     while 1:
         link.status()
