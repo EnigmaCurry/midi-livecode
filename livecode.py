@@ -71,7 +71,8 @@ def timeline_main():
             if playing and not timeline.started:
                 beat_time = (60 / msg_data['bpm'])
                 delay_time = (4*beat_time) - (beat_time * (msg_data['beat'] % 4)) - nudge_time
-                time.sleep(delay_time)
+                if delay_time > 0:
+                    time.sleep(delay_time)
                 timeline.background()
             elif not playing and timeline.started:
                 timeline.stop()
