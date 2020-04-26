@@ -11,10 +11,9 @@ import LinkToPy
 
 def main(timeline):
     "Your main timeline goes here"
-    molecular_music_box(timeline, "4Bb3", key="B", scale=ib.Scale.major,
+    molecular_music_box(timeline, "10G3.5", key="E", scale=ib.Scale.dorian,
                         loops=18, bars=4, octave=3, length_multiplier=1,
-                        delay=True, channels=1, amp=32, gate=1)
-
+                        delay=False, channels=4, amp=32, gate=1)
     #rhythm_phase(timeline)
 
 def rhythm_phase(timeline):
