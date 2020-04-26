@@ -96,8 +96,9 @@ class CodeWatcher(watchgod.DefaultWatcher):
 
 def main():
     #live coding devloop:
-    carabiner_thread = threading.Thread(target=lambda : os.system(carabiner_path + " > carabiner.log"))
-    carabiner_thread.start()
+    if use_ableton_link:
+        carabiner_thread = threading.Thread(target=lambda : os.system(carabiner_path + " > carabiner.log"))
+        carabiner_thread.start()
     if live_reload:
         watchgod.run_process(os.curdir, timeline_main, args=(), watcher_cls=CodeWatcher)
     else:
