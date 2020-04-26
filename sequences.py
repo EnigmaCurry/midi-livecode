@@ -3,9 +3,11 @@ import re
 import isobar as ib
 import logging
 
+from notes import note_value
+
 log = logging.getLogger(os.path.basename(__file__))
 
-def molecular_music_box(seed, scale=ib.Scale.major, loops=4, bars=4, beats_per_bar = 4, scale_rule=None, duration_rule=None):
+def molecular_music_box(seed, key="C", scale=ib.Scale.major, loops=4, bars=4, beats_per_bar = 4, scale_rule=None, duration_rule=None):
     "The Molecular Music Box - https://youtu.be/3Z8CuAC_-bg"
 
     ## The Molecular Formula:
@@ -23,16 +25,29 @@ def molecular_music_box(seed, scale=ib.Scale.major, loops=4, bars=4, beats_per_b
     ##    the duration of the new note to the other chosen duration.
 
     m = re.match("([0-9]*[.]?[0-9]+)([A-Ga-g][#b]?)([0-9]*[.]?[0-9]+)", seed)
-    dur1, key, dur2 = m.groups()
+    try:
+        dur1, initial_note_name, dur2 = m.groups()
+    except AttributeError:
+        raise AssertionError(f"Could not parse the seed value : '{seed}'")
     dur1 = float(dur1) if float(dur1) - int(float(dur1)) > 0 else int(dur1)
     dur2 = float(dur2) if float(dur2) - int(float(dur2)) > 0 else int(dur2)
 
     times = {}
     beats = 0
+    initial_note = note_value(initial_note_name)
+    log.info("-------------------")
+    log.info(f"Key: {key} {scale.name}")
+    log.info(f"Initial note: {initial_note_name} note:{initial_note}")
+    transpose = note_value(key)
+    key_scale = [transpose+s for s in scale.semitones]
 
-    log.info("Key: {key} {scale}".format(key=key, scale=scale.name))
-    transpose = ib.Note.names.index(key)
-    scale_index = 0
+    try:
+        scale_index = key_scale.index(initial_note)
+    except ValueError:
+        try:
+            scale_index = key_scale.index(initial_note + 12)
+        except ValueError:
+            raise AssertionError(f"{initial_note_name} is not in the scale {key}-{scale.name}, right?")
 
     if scale_rule is None:
         def scale_rule(scale_index, mod_time, times, swapped, n_loop_notes):
@@ -62,7 +77,7 @@ def molecular_music_box(seed, scale=ib.Scale.major, loops=4, bars=4, beats_per_b
             if swapped:
                 swaps += 1
             if last_note is None:
-                note = last_note = 0
+                note = last_note = scale.get(scale_index)
             else:
                 last_scale_index = scale_index
                 scale_index = scale_rule(scale_index=scale.indexOf(last_note),
@@ -75,5 +90,5 @@ def molecular_music_box(seed, scale=ib.Scale.major, loops=4, bars=4, beats_per_b
             beats += duration
             times[mod_time] = times.get(mod_time, 0) + 1
         note_loops.append(note_loop)
-    log.info("seed:{seed} swaps:{swaps}".format(seed=seed,swaps=swaps))
+    log.info(f"seed:{seed} swaps:{swaps}")
     return note_loops
