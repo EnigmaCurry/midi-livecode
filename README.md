@@ -34,8 +34,7 @@ This is a live-coding environment for MIDI composition with support for Ableton 
 ## Isobar
 
 Isobar is forked from https://github.com/ideoforms/isobar and several
-modifications are made herein. [Please follow the isobar LICENSE
-terms](isobar/LICENSE.md)
+modifications are made herein. Please follow the terms of the [LICENSE](LICENSE.txt).
 
 ## Live reload
 
