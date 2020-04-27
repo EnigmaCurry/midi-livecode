@@ -1,5 +1,6 @@
 from isobar.note import *
 from isobar.pattern.core import *
+from isobar.timeline import TICKS_PER_BEAT
 
 import mido
 
@@ -121,35 +122,55 @@ class MidiFileIn:
 
 class MidiFileOut:
     """ Write events to a MIDI file.
-        Requires the MIDIUtil package:
-        https://code.google.com/p/midiutil/ """
 
-    def __init__(self, filename = "score.mid", num_tracks = 16):
-        # requires midiutil
-        from midiutil.MidiFile import MIDIFile
+    EC: Rewritten using mido
+    """
 
+    def __init__(self, filename = "score.mid"):
         self.filename = filename
-        self.score = MIDIFile(num_tracks)
+        self.score = mido.MidiFile(ticks_per_beat=TICKS_PER_BEAT)
+        self.tracks = {} # channel->track
         self.time = 0
+        self.ticks = 0
+        self.tick_delta = 0
+        self.num_events = 0
 
     def tick(self, tick_length):
-        self.time += tick_length
+        self.ticks += 1
+        if self.num_events > 0:
+            # Don't start counting deltas until we receive the first event
+            self.tick_delta += 1
 
     def note_on(self, note = 60, velocity = 64, channel = 0, duration = 1):
         #------------------------------------------------------------------------
         # avoid rounding errors
         #------------------------------------------------------------------------
-        time = round(self.time, 5)
-        self.score.addNote(channel, channel, note, time, duration, velocity)
+        #time = round(self.time, 5)
+        track = self.tracks.get(channel, None)
+        if track is None:
+            track = self.tracks[channel] = mido.MidiTrack()
+            self.score.tracks.append(track)
+        track.append(mido.Message('note_on', note=note, velocity=velocity, time=self.tick_delta))
+        self.tick_delta = 0
+        self.num_events += 1
 
     def note_off(self, note = 60, channel = 0):
-        time = round(self.time, 5)
-        self.score.addNote(channel, channel, note, time, 0, 0)
+        #time = round(self.time, 5)
+        track = self.tracks.get(channel, None)
+        if track is None:
+            track = self.tracks[channel] = mido.MidiTrack()
+            self.score.tracks.append(track)
+        track.append(mido.Message('note_off', note=note, velocity=127, time=self.tick_delta))
+        self.tick_delta = 0
+        self.num_events += 1
+
+    def all_notes_off(self, channel = 0):
+        log.info("[midi] All notes off (channel = %d)" % (channel))
+        for n in range(128):
+            self.note_off(n, channel)
 
     def write(self):
-        fd = open(self.filename, 'wb')
-        self.score.writeFile(fd)
-        fd.close()
+        self.score.save(self.filename)
 
 class PatternWriterMIDI:
     """ Writes a pattern to a MIDI file.

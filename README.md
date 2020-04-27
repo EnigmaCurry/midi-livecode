@@ -36,6 +36,20 @@ This is a live-coding environment for MIDI composition with support for Ableton 
 Isobar is forked from https://github.com/ideoforms/isobar and several
 modifications are made herein. Please follow the terms of the [LICENSE](LICENSE.txt).
 
+## Recording to a midi file
+
+You can record your timeline to a midi file (up to 16 channels):
+
+```
+python livecode.py --out test1.mid
+```
+
+This records in real-time. Currently, this will disable the normal output to the
+MIDI loop port, so you will not hear anything while it records. If your sequence
+has a finite length, it will exit when done. If your sequence has an infinite
+length, you can press Ctrl-C and the midi file will be saved and cut at that
+time.
+
 ## Live reload
 
 When changes are detected in the source files, the program automatically

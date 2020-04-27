@@ -83,6 +83,7 @@ class MidiIn:
 class MidiOut:
     def __init__(self, target = None):
         self.midi = rtmidi.MidiOut()
+        self.ticks = 0
 
         ports = self.midi.get_ports()
         if len(ports) == 0:
@@ -103,6 +104,7 @@ class MidiOut:
         log.info("Opened MIDI output: %s" % port_name)
 
     def tick(self, tick_length):
+        self.ticks += 1
         pass
 
     def note_on(self, note = 60, velocity = 64, channel = 0):
