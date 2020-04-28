@@ -8,7 +8,7 @@ import click
 import logging
 logging.basicConfig(level=logging.INFO)
 
-import isobar as ib
+from . import isobar as ib
 import rtmidi
 import mido
 import LinkToPy

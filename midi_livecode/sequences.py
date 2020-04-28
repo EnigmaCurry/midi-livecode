@@ -1,6 +1,6 @@
 import os
 import re
-import isobar as ib
+from . import isobar as ib
 import logging
 
 from notes import note_value

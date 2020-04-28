@@ -3,8 +3,8 @@ import time
 import logging
 log = logging.getLogger(os.path.basename(__file__))
 
-import isobar as ib
-from isobar.io.midifile import MidiFileOut
+from . import isobar as ib
+from .isobar.io.midifile import MidiFileOut
 from livecode import create_timeline, get_midi_output
 import sequences
 import LinkToPy
