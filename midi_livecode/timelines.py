@@ -3,11 +3,10 @@ import time
 import logging
 log = logging.getLogger(os.path.basename(__file__))
 
-from . import isobar as ib
-from .isobar.io.midifile import MidiFileOut
-from livecode import create_timeline, get_midi_output
-import sequences
-import LinkToPy
+import isobar as ib
+from isobar.io.midifile import MidiFileOut
+from .livecode import create_timeline, get_midi_output
+from . import sequences
 
 def main(timeline):
     "Your main timeline goes here"

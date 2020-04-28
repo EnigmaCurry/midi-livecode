@@ -8,10 +8,10 @@ import click
 import logging
 logging.basicConfig(level=logging.INFO)
 
-from . import isobar as ib
+import isobar as ib
 import rtmidi
 import mido
-import LinkToPy
+from . import LinkToPy
 import watchgod
 
 ## Settings:
@@ -57,7 +57,7 @@ def create_timeline(output, bpm=120, reset=True):
     return ib.Timeline(bpm, output)
 
 def timeline_main(out=None):
-    import timelines
+    from . import timelines
 
     if out is None:
         output = get_midi_output()

@@ -1,9 +1,9 @@
 import os
 import re
-from . import isobar as ib
+import isobar as ib
 import logging
 
-from notes import note_value
+from .notes import note_value
 
 log = logging.getLogger(os.path.basename(__file__))
 

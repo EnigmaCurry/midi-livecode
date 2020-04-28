@@ -9,12 +9,14 @@ This is a live-coding environment for MIDI composition with support for Ableton 
  * Set your DAW to listen to the MIDI loop
  * [Download the latest version of Python](https://www.python.org/downloads/)
  * Clone or download this repository
+ * Open a terminal and change directory (`cd`) to where you've downloaded this
  * Run these commands to install:
      * `python -m venv env`
      * On Windows: `.\env\Scripts\activate`
      * On Linux / Mac: `source env/bin/activate`
      * (Note: you will need to re-activate each time you open your terminal)
-     * `pip install -r requirements.txt`
+     * `python -m pip install --upgrade pip`
+     * `pip install -e .`
  * Put timelines in `timelines.py`
  * Put sequences in `sequences.py`
  * Change settings at the top of `livecode.py`:
@@ -29,7 +31,7 @@ This is a live-coding environment for MIDI composition with support for Ableton 
    * `default_bpm` - The beats per minute to use if *not* using Ableton Link.
    * `nudge_time` - Start playback earlier than otherwise, to correct for
      constant-time delay (seconds).
- * Run `python livecode.py` and it will autoreload on save
+ * Run `python -m midi_livecode.livecode` and it will autoreload on save
 
 ## Isobar
 
@@ -41,7 +43,7 @@ modifications are made herein. Please follow the terms of the [LICENSE](LICENSE.
 You can record your timeline to a midi file (up to 16 channels):
 
 ```
-python livecode.py --out test1.mid
+python -m midi_livecode.livecode --out test1.mid
 ```
 
 This records in real-time. Currently, this will disable the normal output to the
