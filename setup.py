@@ -21,7 +21,7 @@ setuptools.setup(
     python_requires='>=3.6',
     install_requires=[
         "isobar @ https://github.com/EnigmaCurry/isobar/archive/master.tar.gz",
-        "edn_format",
+        "edn_format==0.7.0",
         "watchgod==0.6",
         "click==7.1.1",
         "numpy",
