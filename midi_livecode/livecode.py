@@ -9,7 +9,6 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 import isobar as ib
-import rtmidi
 import mido
 from . import LinkToPy
 import watchgod
@@ -56,9 +55,12 @@ def create_timeline(output, bpm=120, reset=True):
             output.all_notes_off(ch)
     return ib.Timeline(bpm, output)
 
-def timeline_main(out=None):
+def timeline_main(out=None, use_ableton_link=False, timeline_func=None, timeline_args={}):
     from . import timelines
-
+    try:
+        timeline_func = getattr(timelines, timeline_func)
+    except TypeError:
+        timeline_func = timelines.main
     if out is None:
         output = get_midi_output()
         reset = True
@@ -98,9 +100,10 @@ def timeline_main(out=None):
             log.info("Keyboard interrupt!")
     else:
         timeline = create_timeline(output, default_bpm, reset)
-        timelines.main(timeline)
+        timeline_func(timeline, **timeline_args)
         try:
             log.info("Recording midi file in real-time, please wait, or press Ctrl-C to stop.")
+            log.info(f"Running timeline:{timeline_func.__name__}")
             timeline.run()
             print("done")
         except KeyboardInterrupt:
@@ -114,22 +117,26 @@ class CodeWatcher(watchgod.DefaultWatcher):
     def should_watch_file(self, entry):
         return entry.name.endswith(('.py', '.pyx', '.pyd')) and not entry.name.startswith(".")
 
-@click.command()
-@click.option('--out', default=None, help="name of midi file to output")
-def main(out):
-    global use_ableton_link, live_reload
+def main(out=None, ableton_link=False, live_reload=False, timeline=None, timeline_args={}):
     #live coding devloop:
-    if out is not None:
-        use_ableton_link = False
-        live_reload = False
-    if use_ableton_link:
+    if ableton_link:
         carabiner_thread = threading.Thread(target=lambda : os.system(carabiner_path + " > carabiner.log"))
         carabiner_thread.start()
 
+    args = (out, ableton_link, timeline, timeline_args)
     if live_reload:
-        watchgod.run_process(os.curdir, timeline_main, args=(out,), watcher_cls=CodeWatcher)
+        import rtmidi
+        watchgod.run_process(os.curdir, timeline_main, args=args, watcher_cls=CodeWatcher)
     else:
-        timeline_main(out)
+        timeline_main(*args)
+
+@click.command()
+@click.option('--out', default=None, help="name of midi file to output")
+@click.option('--ableton-link/--no-ableton-link', default=use_ableton_link)
+@click.option('--live-reload/--no-live-reload', default=live_reload)
+@click.option('--timeline', default=None)
+def command(out, ableton_link, live_reload, timeline):
+    main(out=out, ableton_link=ableton_link, live_reload=live_reload, timeline=timeline)
 
 if __name__ == "__main__":
-    main()
+    command()
