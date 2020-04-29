@@ -23,7 +23,6 @@ from __future__ import print_function
 import socket
 import edn_format
 import os
-import numpy as np
 import time
 import threading
 import errno
