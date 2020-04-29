@@ -23,7 +23,6 @@ setuptools.setup(
         "isobar @ https://github.com/EnigmaCurry/isobar/archive/v0.0.2-enigmacurry.tar.gz",
         "edn_format==0.7.0",
         "watchgod==0.6",
-        "click==7.1.1",
-        "numpy",
+        "click==7.1.1"
     ],
 )
