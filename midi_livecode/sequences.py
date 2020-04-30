@@ -24,6 +24,10 @@ def molecular_music_box(seed, key="C", scale=ib.Scale.major, loops=4, bars=4, be
     ##    the same time in the loop as any previous note, in which case, change
     ##    the duration of the new note to the other chosen duration.
 
+    print("bars", bars)
+    print("loops", loops)
+    print("key", key)
+    print("scale", scale)
     m = re.match("([0-9]*[.]?[0-9]+)([A-Ga-g][#b]?)([0-9]*[.]?[0-9]+)", seed)
     try:
         dur1, initial_note_name, dur2 = m.groups()

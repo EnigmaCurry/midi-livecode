@@ -91,7 +91,7 @@ def timeline_main(out=None, use_ableton_link=False, timeline_func=None, timeline
             elif not playing:
                 # Updates timeline bpm if changed when not playing:
                 timeline = create_timeline(output, ableton_link.bpm_, reset)
-                timelines.main(timeline)
+                timeline_func(timeline, **timeline_args)
 
         ableton_link.status(callback=ableton_transport_stop)
         try:
