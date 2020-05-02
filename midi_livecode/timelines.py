@@ -18,9 +18,9 @@ def main(timeline):
         else:
             return scale_index
 
-    molecular_music_box(timeline, "4C3", key="C", scale=ib.Scale.dorian,
+    molecular_music_box(timeline, "14C3", key="C", scale=ib.Scale.dorian,
                         loops=4, bars=8, octave=3, length_multiplier=1,
-                        delay=False, channels=1, amp=32, gate=0.9, repeats=2)
+                        delay=True, channels=1, amp=32, gate=0.9, repeats=4+2)
     #test1(timeline)
 
 def test1(timeline):
