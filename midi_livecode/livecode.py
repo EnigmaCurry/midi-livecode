@@ -111,7 +111,7 @@ def timeline_main(out=None, use_ableton_link=False, timeline_func=None, timeline
         finally:
             if out is not None:
                 output.write()
-                log.info(f"midi file written: {out.name}")
+                log.info(f"midi file written: {out}")
 
 class CodeWatcher(watchgod.DefaultWatcher):
     def should_watch_file(self, entry):
