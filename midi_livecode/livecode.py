@@ -122,7 +122,7 @@ def main(out=None, ableton_link=False, live_reload=False, timeline=None, timelin
     if ableton_link:
         carabiner_thread = threading.Thread(target=lambda : os.system(carabiner_path + " > carabiner.log"))
         carabiner_thread.start()
-    if out is not None and type(out) == str:
+    if type(out) == str:
         out = open(out,"wb")
     args = (out, ableton_link, timeline, timeline_args)
     if live_reload:
