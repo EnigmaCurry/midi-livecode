@@ -66,6 +66,7 @@ def timeline_main(out=None, use_ableton_link=False, timeline_func=None, timeline
         reset = True
     else:
         output = ib.io.midifile.MidiFileOut(out)
+        use_ableton_link = False
         reset = False
 
     if use_ableton_link:
