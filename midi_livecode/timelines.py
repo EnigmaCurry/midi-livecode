@@ -36,6 +36,11 @@ def molecular_music_box(timeline, seed="4E3", loops=4, bars=4, key="C", scale=ib
                                                 scale_rule=scale_rule, key=key, duration_rule=duration_rule, bars=bars,
                                                 beats_per_bar=beats_per_bar)
 
+    print("delay", delay)
+    if delay:
+        print("length", bars*loops)
+    else:
+        print("length", bars)
     for l in range(len(note_loops)):
         note_loop = note_loops[l]
         for n in range(len(note_loop)):
