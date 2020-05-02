@@ -120,11 +120,13 @@ class CodeWatcher(watchgod.DefaultWatcher):
 
 def main(out=None, ableton_link=False, live_reload=False, timeline=None, timeline_args={}):
     #live coding devloop:
+    if type(out) == str:
+        ableton_link = False
+        live_reload = False
+        out = open(out,"wb")
     if ableton_link:
         carabiner_thread = threading.Thread(target=lambda : os.system(carabiner_path + " > carabiner.log"))
         carabiner_thread.start()
-    if type(out) == str:
-        out = open(out,"wb")
     args = (out, ableton_link, timeline, timeline_args)
     if live_reload:
         import rtmidi
@@ -140,5 +142,3 @@ def main(out=None, ableton_link=False, live_reload=False, timeline=None, timelin
 def command(out, ableton_link, live_reload, timeline):
     main(out=out, ableton_link=ableton_link, live_reload=live_reload, timeline=timeline)
 
-if __name__ == "__main__":
-    command()

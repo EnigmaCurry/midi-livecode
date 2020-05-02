@@ -18,8 +18,8 @@ def main(timeline):
         else:
             return scale_index
 
-    molecular_music_box(timeline, "2C1", key="C", scale=ib.Scale.phrygian,
-                        loops=2, bars=4, octave=3, length_multiplier=1,
+    molecular_music_box(timeline, "4C3", key="C", scale=ib.Scale.dorian,
+                        loops=8, bars=8, octave=3, length_multiplier=1,
                         delay=False, channels=1, amp=32, gate=0.9, repeats=2)
     #test1(timeline)
 
@@ -40,13 +40,13 @@ def molecular_music_box(timeline, seed="4E3", loops=4, bars=4, key="C", scale=ib
         note_loop = note_loops[l]
         for n in range(len(note_loop)):
             loop = note_loop[n]
-            for note in loop['note']:
-                if note and note > 127:
-                    raise ValueError("Rule creates midi notes higher than 128, maybe try fewer bars or loops")
             d = loop['delay']
             if not delay:
                 d = loop['delay'] - (bars * beats_per_bar * l)
             seq = ib.PSeq(loop['note'], repeats=repeats) + octave*12
+            for note in seq:
+                if note and note > 127:
+                    raise ValueError("These settings create midi notes higher than 128, maybe try fewer bars or loops")
             timeline.sched({'note': seq, 'dur': ib.PSeq(loop['dur'], repeats=repeats) * length_multiplier,
                             'gate': gate, 'channel': (l % channels) +
                             channel_offset, 'amp': amp}, delay=d)

@@ -31,7 +31,7 @@ This is a live-coding environment for MIDI composition with support for Ableton 
    * `default_bpm` - The beats per minute to use if *not* using Ableton Link.
    * `nudge_time` - Start playback earlier than otherwise, to correct for
      constant-time delay (seconds).
- * Run `python -m midi_livecode.livecode` and it will autoreload on save
+ * Run `python -m midi_livecode` and it will autoreload on save
 
 ## Isobar
 
