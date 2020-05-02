@@ -99,7 +99,7 @@ def timeline_main(out=None, use_ableton_link=False, timeline_func=None, timeline
         except KeyboardInterrupt:
             log.info("Keyboard interrupt!")
     else:
-        timeline = create_timeline(output, default_bpm, reset)
+        timeline = create_timeline(output, bpm=999, reset=reset)
         timeline_func(timeline, **timeline_args)
         try:
             log.info("Recording midi file in real-time, please wait, or press Ctrl-C to stop.")
@@ -111,7 +111,7 @@ def timeline_main(out=None, use_ableton_link=False, timeline_func=None, timeline
         finally:
             if out is not None:
                 output.write()
-                log.info(f"midi file written: {out}")
+                log.info(f"midi file written: {out.name}")
 
 class CodeWatcher(watchgod.DefaultWatcher):
     def should_watch_file(self, entry):
@@ -122,7 +122,8 @@ def main(out=None, ableton_link=False, live_reload=False, timeline=None, timelin
     if ableton_link:
         carabiner_thread = threading.Thread(target=lambda : os.system(carabiner_path + " > carabiner.log"))
         carabiner_thread.start()
-
+    if out is not None:
+        out = open(out,"wb")
     args = (out, ableton_link, timeline, timeline_args)
     if live_reload:
         import rtmidi
