@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="midi_livecode", # Replace with your own username
-    version="0.0.3",
+    version="0.0.4",
     author="EnigmaCurry",
     author_email="ryan@enigmacurry.com",
     description="A live-coding environment for MIDI composition with support for Ableton Link.",
